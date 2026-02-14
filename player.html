@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- CSS -->
+        <link href="bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link href="stylesheet.css" rel="stylesheet">
+        <script src="bootstrap.bundle.min.js"></script>
+        <title>VaultTube</title>
+    </head>
+    <body>
+        <!-- Javascript -->
+        <script src="jquery.min.js"></script>
+        <div class="container-lg py-4">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light rounded shadow-sm mb-4">
+                <div class="container-fluid">
+                  <a class="navbar-brand fw-bold fs-4" href="/">VaultTube</a>
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+                  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 fs-6">
+                      <li class="nav-item">
+                        <a class="nav-link px-3" href="/download.html">Download</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link px-3" href="/channels.html">Channels</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link px-3" href="/playlists.html">Playlists</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link px-3" href="/stats.html">Stats</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link px-3" href="/random.html">Random</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link px-3" href="/upload.html">Upload</a>
+                      </li>
+                    </ul>
+
+                    <div class="form-check form-switch d-flex align-items-center ms-3">
+                      <input class="form-check-input" type="checkbox" id="darkModeToggle" aria-label="Toggle dark mode" />
+                      <label class="form-check-label ms-2 text-nowrap" for="darkModeToggle">Dark Mode</label>
+                    </div>
+
+                    <form class="d-flex ms-3" onsubmit="do_search(); return false;">
+                      <input class="form-control me-2 rounded-pill border-2" type="search" placeholder="Search" aria-label="Search" id="searchtext">
+                      <button class="btn btn-outline-primary rounded-pill px-4" type="button" onclick="do_search();">Search</button>
+                    </form>
+                  </div>
+                </div>
+            </nav>
+<link href="video-js.css" rel="stylesheet" />
+<script src="video.min.js"></script>
+
+<div id="playerdiv" >
+    <video id="player" class="video-js vjs-default-skin vjs-big-play-centered videojs-overlay-player" data-setup='{}' controls playsinline preload="auto" width="auto" height="auto"></video>
+</div>
+<script src="scripts.js"></script>
+<div class="row">
+    <div class="toprow" class="pl-3 pt-2 w-100"><img id="watchstatus" class="pe-1"><img id="delete" src="/static/imgs/slash.svg" class="pe-1" onclick='deletevid();'><h3 id="title"></h3></div>
+    <div><h5 id="creator"></h5></div>
+    <div><p id="desc"></p></div>
+    <div><p id="nextvideo"></p></div>
+    <div><p id="prevvideo"></p></div>
+</div>
+<script>
+    const querystring = window.location.search;
+    const urlparams = new URLSearchParams(querystring);
+    const id = urlparams.get('id');
+    const video = document.querySelector("video");
+    var tspoll;
+    watch_status(id);
+    vPlayer = videojs('player',{techOrder: ["html5"],autoplay: false});
+    $.getJSON("/api/video/"+id+".mp4",function(data){
+        var jobj = jQuery.parseJSON(data[0]["json"]);
+        //Load Video
+        vPlayer.src([{type: "video/webm",src: data[0]["filepath"]}]);
+        vPlayer.fluid(true);
+        //Adding Info to Player
+        $("#title").text(data[0]['title']);
+        $("#desc").html(jobj['items'][0]["snippet"]['description'].replace('\n','<br>').replace('\r','<br>'));
+        $("#creator").html("<a href='/creator.html?creator="+data[0]['channelId']+"'>"+data[0]['youtuber']+"</a>");
+        //Set Timestamp if non-0
+        if(!data[0]['timestamp'] == 0){
+            vPlayer.currentTime(data[0]['timestamp']);
+        }
+    });
+    //Pause Listener - Push Timestamp to server and disable polling
+    video.addEventListener("pause",(event) => {
+        clearInterval(tspoll);
+        $.getJSON("/api/set_timestamp/"+video.currentTime+"/"+id,function(data){});
+    });
+    //Play Listener - Start polling
+    video.addEventListener("play",(event) => {
+        tspoll = window.setInterval(function(){
+            $.getJSON("/api/set_timestamp/"+video.currentTime+"/"+id,function(data){});
+        }, 5000);
+    });
+    //End Listener - Update watch status
+    video.addEventListener("ended",(event) => {
+        $.ajax({url: "/api/watched/"+id, success: function(result){
+            watch_status(id);
+        }});
+        $.getJSON("/api/set_timestamp/0/"+id,function(data){});
+        clearInterval(tspoll);
+    });
+    video.addEventListener("canplay",(event) => {
+        if(vPlayer.videoHeight() > vPlayer.videoWidth()){
+            $("#playerdiv").width(400);
+            console.log("Suspected Vertical Video, changing player height");
+        }
+    });
+    $.getJSON("/api/find_next_previous/"+id,function(data){
+        if(data["NextID"] !== undefined){
+            $("#nextvideo").html("Next Up: <a href='/player.html?id="+data["NextID"]+"'>"+data["NextTitle"]+"</a>");
+        }
+        if(data["PreviousID"] !== undefined){
+            $("#prevvideo").html("Previous: <a href='/player.html?id="+data["PreviousID"]+"'>"+data["PreviousTitle"]+"</a>");
+        }
+    });
+    function contentChange(){}
+    function deletevid(){
+        if (confirm("Are you sure you want to delete this video?") == true){
+            $.ajax({url: "/api/delete/"+id, success: function(result){
+                window.location.href='/';
+            }});
+        }
+    }
+    // Keyboard arrow left/right => seek +/- 15s
+    document.addEventListener('keydown', function(event) {
+    if (event.target.tagName.toLowerCase() !== 'input' && event.target.tagName.toLowerCase() !== 'textarea') {
+        if (event.key === "ArrowRight") {
+            vPlayer.currentTime(vPlayer.currentTime() + 15);
+        }
+        if (event.key === "ArrowLeft") {
+            vPlayer.currentTime(Math.max(0, vPlayer.currentTime() - 15));
+        }
+        if (event.key === " " || event.key === "Spacebar") { // Spacebar for older browsers
+            event.preventDefault(); // Prevent page from scrolling
+            if (vPlayer.paused()) {
+                vPlayer.play();
+            } else {
+                vPlayer.pause();
+            }
+        }
+    }
+    });
+
+</script>
+        </div>
+        <hr class="my-4">
+        <footer id="footer" class="py-3 bg-light shadow-sm mt-auto">
+            <div class="container text-center">
+                <p class="mb-0 fst-italic text-secondary">VaultTube v1.0.0-alpha &nbsp;
+                  |&nbsp; <a href="https://github.com/jedihomelab/VaultTube" target="_blank" class="link-secondary"><img src="/static/imgs/github.svg" height="20" width="20" alt="GitHub" /></a>
+                  &nbsp;|&nbsp; <a href="https://hub.docker.com/repository/docker/dyslexicjedi/vaulttube/general" target="_blank" class="link-secondary"><img src="/static/imgs/package.svg" height="20" width="20" alt="Docker" /></a>
+                </p>
+            </div>
+        </footer>
+        <script>
+          function do_search(){
+            var searchterm = $("#searchtext").val();
+            window.location.href='/search.html?txt='+encodeURIComponent(searchterm);
+          }
+        </script>
+        <script>
+          function enableDarkMode(enabled) {
+            if(enabled) {
+              document.documentElement.classList.add('dark-mode');
+              $('#darkModeToggle').prop('checked', true);
+            } else {
+              document.documentElement.classList.remove('dark-mode');
+              $('#darkModeToggle').prop('checked', false);
+            }
+          }
+
+          $(document).ready(function() {
+            // On load, check saved preference
+            let darkModePref = localStorage.getItem('darkModeEnabled') === 'true';
+            enableDarkMode(darkModePref);
+
+            $('#darkModeToggle').change(function() {
+              let enabled = $(this).prop('checked');
+              enableDarkMode(enabled);
+              localStorage.setItem('darkModeEnabled', enabled);
+            });
+          });
+        </script>
+    </body>
+</html>

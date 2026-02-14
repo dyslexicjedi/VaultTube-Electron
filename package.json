@@ -1,0 +1,41 @@
+{
+  "name": "vaulttube-macos",
+  "version": "1.0.0",
+  "description": "VaultTube Desktop Application for MacOS",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --inspect"
+  },
+  "keywords": [
+    "electron",
+    "macos",
+    "video",
+    "vaulttube"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.3.3"
+  },
+  "dependencies": {
+    "electron-builder": "^26.7.0",
+    "electron-store": "^8.1.0"
+  },
+  "type": "commonjs",
+  "build": {
+    "mac": {
+        "target": [
+        {
+            "target": "mas",
+            "arch": [
+            "universal"
+            ]
+        },
+        {
+            "target": "mas-dev"
+        }
+        ]
+    }
+    }
+}
