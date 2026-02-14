@@ -66,7 +66,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label for="serverUrlInput" class="form-label">Server URL</label>
-            <input type="text" class="form-control" id="serverUrlInput" value="http://10.0.10.5:3000">
+            <input type="text" class="form-control" id="serverUrlInput" value="http://localhost:5000">
           </div>
           <div class="alert alert-info">
             <small>Enter your Flask server URL. Default is http://localhost:5000</small>
@@ -132,7 +132,7 @@
 <script src="scripts.js"></script>
 <script>
   // Initialize server URL from electronAPI
-  let serverUrl = 'http://10.0.10.5:3000';
+  let serverUrl = 'http://localhost:5000';
   
   // Wait for electronAPI to be available
   function initServerUrl() {
