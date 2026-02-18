@@ -28,16 +28,26 @@
   },
   "type": "commonjs",
   "build": {
+    "appId": "com.vaulttube.macos",
+    "publish": {
+      "provider": "github",
+      "owner": "dyslexicjedi",
+      "repo": "VaultTube-Electron"
+    },
     "mac": {
-        "target": [
+      "category": "public.app-category.video",
+      "target": [
         {
-            "target": "mas",
-            "arch": [
-            "universal"
-            ]
+          "target": "dmg",
+          "arch": ["universal"]
         },
         {
-            "target": "mas-dev"
+          "target": "zip",
+          "arch": ["universal"]
+        },
+        {
+          "target": "mas",
+          "arch": ["universal"]
         }
         ]
     }
