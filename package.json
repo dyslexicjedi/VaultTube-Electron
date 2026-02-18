@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "VaultTube Desktop Application for MacOS",
   "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dyslexicjedi/VaultTube-Electron.git"
+  },
   "scripts": {
     "start": "electron .",
     "dev": "electron . --inspect"
