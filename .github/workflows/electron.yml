@@ -25,7 +25,7 @@ jobs:
       
       - name: Build Electron App (Test)
         if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
-        run: npx electron-builder build --universal --publish never -c.mac.identity=null -c.mac.target=dmg,zip
+        run: npx electron-builder build --universal --publish never -c.mac.identity=null -c.mac.target='["dmg","zip"]'
       
       - name: Build and Publish Release
         if: startsWith(github.ref, 'refs/tags/v')
