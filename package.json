@@ -1,7 +1,7 @@
 {
-  "name": "vaulttube-macos",
+  "name": "vaulttube-electron",
   "version": "0.1.0",
-  "description": "VaultTube Desktop Application for MacOS",
+  "description": "VaultTube Desktop Application for Electron",
   "main": "main.js",
   "repository": {
     "type": "git",
@@ -14,10 +14,14 @@
   "keywords": [
     "electron",
     "macos",
+    "linux",
     "video",
     "vaulttube"
   ],
-  "author": "",
+  "author": {
+    "name": "dyslexicjedi",
+    "email": "rob@dyslexicjedi.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "electron": "^28.3.3",
@@ -28,7 +32,7 @@
   },
   "type": "commonjs",
   "build": {
-    "appId": "com.vaulttube.macos",
+    "appId": "com.vaulttube.electron",
     "publish": {
       "provider": "github",
       "owner": "dyslexicjedi",
@@ -37,6 +41,23 @@
     "mac": {
       "category": "public.app-category.video",
       "target": ["dmg", "zip"]
+    },
+    "linux": {
+      "category": "Video",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "rpm",
+          "arch": ["arm64"]
+        }
+      ]
     }
     }
 }
