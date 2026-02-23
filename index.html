@@ -4,45 +4,274 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="bootstrap.min.css" rel="stylesheet">
-    <link href="stylesheet.css" rel="stylesheet">
     <script src="bootstrap.bundle.min.js"></script>
     <title>VaultTube - Configuration</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f8f9fa;
             margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            overflow: hidden;
         }
-        .config-container {
-            max-width: 500px;
+
+        /* Subtle animated background orbs */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            animation: drift 12s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        body::before {
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, #6c63ff, transparent);
+            top: -120px;
+            left: -120px;
+        }
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #ff4d6d, transparent);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -6s;
+        }
+        @keyframes drift {
+            from { transform: translate(0, 0) scale(1); }
+            to   { transform: translate(40px, 30px) scale(1.08); }
+        }
+
+        .config-card {
+            position: relative;
+            z-index: 1;
             width: 100%;
-            padding: 2rem;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 440px;
+            padding: 2.75rem 2.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+            animation: fadeUp 0.5s ease both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Logo / Icon */
+        .brand-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1.25rem;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #6c63ff, #ff4d6d);
+            box-shadow: 0 8px 24px rgba(108, 99, 255, 0.45);
+        }
+        .brand-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: #fff;
+        }
+
+        .brand-title {
+            text-align: center;
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.25rem;
+        }
+        .brand-subtitle {
+            text-align: center;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 2rem;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+            margin-bottom: 1.75rem;
+        }
+
+        /* Form */
+        .form-label-custom {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.5rem;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.35);
+            pointer-events: none;
+        }
+        .input-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        #serverUrlInput {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.6rem;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #serverUrlInput::placeholder {
+            color: rgba(255,255,255,0.25);
+        }
+        #serverUrlInput:focus {
+            border-color: #6c63ff;
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.25);
+        }
+
+        /* Connect button */
+        #connectBtn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 1.25rem;
+            padding: 0.8rem 1rem;
+            background: linear-gradient(135deg, #6c63ff, #8b5cf6);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+        }
+        #connectBtn:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(108, 99, 255, 0.5);
+        }
+        #connectBtn:active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        #connectBtn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Footer hint */
+        .card-footer-hint {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.25);
         }
     </style>
 </head>
 <body>
-    <div class="config-container">
-        <h2 class="text-center mb-4">VaultTube</h2>
-        <div class="mb-3">
-            <label for="serverUrlInput" class="form-label">Server URL</label>
-            <input type="text" class="form-control" id="serverUrlInput" value="http://localhost:5000">
+    <div class="config-card">
+
+        <!-- Brand -->
+        <div class="brand-icon">
+            <!-- Play icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 3l14 9-14 9V3z"/>
+            </svg>
         </div>
-        <button class="btn btn-primary w-100" id="connectBtn">Connect</button>
+        <div class="brand-title">VaultTube</div>
+        <div class="brand-subtitle">Connect to your self-hosted server</div>
+
+        <div class="divider"></div>
+
+        <!-- Form -->
+        <label for="serverUrlInput" class="form-label-custom">Server URL</label>
+        <div class="input-wrapper">
+            <span class="input-icon">
+                <!-- Link icon -->
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+            </span>
+            <input
+                type="text"
+                id="serverUrlInput"
+                placeholder="http://localhost:5000"
+                value="http://localhost:5000"
+                autocomplete="off"
+                spellcheck="false"
+            >
+        </div>
+
+        <button id="connectBtn">
+            <!-- Arrow-right icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+            </svg>
+            Connect
+        </button>
+
+        <div class="card-footer-hint">VaultTube Desktop &mdash; v0.2.0</div>
     </div>
+
     <script src="jquery.min.js"></script>
     <script>
         document.getElementById('connectBtn').addEventListener('click', () => {
-            const url = document.getElementById('serverUrlInput').value;
+            const url = document.getElementById('serverUrlInput').value.trim();
             if (url) {
                 window.electronAPI.setServerUrl(url);
                 window.location.href = url;
             }
+        });
+
+        // Allow pressing Enter to connect
+        document.getElementById('serverUrlInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('connectBtn').click();
         });
     </script>
 </body>

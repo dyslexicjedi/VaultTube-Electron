@@ -1,6 +1,6 @@
 {
   "name": "vaulttube-electron",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "VaultTube Desktop Application for Electron",
   "main": "main.js",
   "repository": {
