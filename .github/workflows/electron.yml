@@ -19,12 +19,21 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '20'
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm cache clean --force
+          rm -rf node_modules package-lock.json
+          npm install
+          npm ls
       
+      - name: Verify dependencies
+        run: |
+          echo "Checking for vulnerable/outdated dependencies..."
+          npm audit || true
+          npm outdated || true
       - name: Build Electron App (Test)
         if: (github.event_name == 'push' || github.event_name == 'pull_request') && !startsWith(github.ref, 'refs/tags/')
         run: npx electron-builder build --mac --x64 --arm64 --publish never -c.mac.identity=null
@@ -41,7 +50,6 @@ jobs:
           ls -la dist/ 2>/dev/null || echo "No dist directory"
           ls -la dist/*.dmg 2>/dev/null || echo "No DMG files"
           ls -la dist/*.zip 2>/dev/null || echo "No ZIP files"
-      
       - name: Upload Artifacts (for non-tag builds)
         if: (github.event_name == 'push' || github.event_name == 'pull_request') && !startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-artifact@v4
@@ -61,12 +69,22 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '20'
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm install
-      
+        run: |
+          npm cache clean --force
+          rm -rf node_modules package-lock.json
+          npm install
+          npm ls
+
+      - name: Verify dependencies
+        run: |
+          echo "Checking for vulnerable/outdated dependencies..."
+          npm audit || true
+          npm outdated || true
+
       - name: Build Electron App (Test)
         if: (github.event_name == 'push' || github.event_name == 'pull_request') && !startsWith(github.ref, 'refs/tags/')
         run: npx electron-builder build --x64 --arm64 --linux --publish never
